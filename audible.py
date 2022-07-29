@@ -21,7 +21,7 @@ def talk(text):
     speak(text,'en',file="audible.mp3",save=True, speak=True)
 
 filename=input()
-poppler_path = r'/opt/homebrew/Cellar/poppler/22.06.0/bin'
+poppler_path = r'path'
 pdf_path = filename
 images = convert_from_path(pdf_path=pdf_path, poppler_path=poppler_path)
 file_names=[]
@@ -32,11 +32,11 @@ for count, img in enumerate(images):
 print(file_names)
 
 for file in file_names:
-    img=cv2.imread(file)
+    img=cv2.imread(files)
     text=pytesseract.image_to_string(Image.open(file), lang='eng')
     sent=sent+text
 with open('audible.txt', 'w', encoding='utf-8') as f:
-    print(sent, file=f)
+    print(sent, file=file)
 
 abcd=open("audible.txt",'r').read()
 print("speaking....")
