@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>home page</title>
+    <link rel="stylesheet" href="index.css">
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+<body>
+<center>
+    <h1 style="font-size: 40px;font-family:'.AppleSystemUIFont';margin-top: 100px">Hi this is home page</h1>
+    <h2 style="font-size: 20px; color:green; font-weight:bold;">You are on the home page</h2>
+    <div id="border">
+        <br><br>
+    <button id="logout" class="button">sign out</button>
+    </div>
+</center>
+
+<script>
+
+  document.getElementById('logout').addEventListener('click', async function () {
+    try {
+      await axios.post('http://backend.example.com/logout', {}, { withCredentials: true });
+      localStorage.removeItem('token');  // Remove token from local storage
+      window.alert('Logged out successfully!');
+      location.replace('index.html');
+    } catch (error) {
+      console.error(error.message);
+    }
+  });
+
+</script>
+</body>
+</html>
