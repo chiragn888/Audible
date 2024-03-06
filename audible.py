@@ -1,14 +1,12 @@
 from pdf2image import convert_from_path
 from PIL import Image
-from numpy import append
-import pytesseract
 import cv2
-from distutils.command.config import config
-from googletrans import Translator
+import numpy as np
+import pytesseract
+from moviepy.editor import AudioFileClip, ColorClip, TextClip, CompositeVideoClip
 import os
 from text_to_speech import speak
 import pyttsx3
-import re
 import re
 import json
 
@@ -32,21 +30,32 @@ for count, img in enumerate(images):
 print(file_names)
 
 for file in file_names:
-    img=cv2.imread(files)
+    img=cv2.imread(file)
     text=pytesseract.image_to_string(Image.open(file), lang='eng')
     sent=sent+text
 with open('audible.txt', 'w', encoding='utf-8') as f:
-    print(sent, file=file)
+    print(sent, file=f)
 
 abcd=open("audible.txt",'r').read()
 print("speaking....")
-talk(abcd)    
+talk(abcd)
 
+def create_video_with_subtitles(audio_path, subtitle_text, video_path='output_video.mp4'):
+    # Load the audio file
+    audio_clip = AudioFileClip(audio_path)
+    # Calculate duration of the audio file
+    duration = audio_clip.duration
+    # Create a blank color clip as a background
+    color_clip = ColorClip(size=(640, 480), color=(255, 255, 255), duration=duration)
+    # Generate a subtitle clip
+    subtitle_clip = TextClip(subtitle_text, fontsize=24, color='black', size=color_clip.size)
+    subtitle_clip = subtitle_clip.set_position(('center', 'bottom')).set_duration(duration)
+    # Composite the audio and subtitle clips
+    final_video = CompositeVideoClip([color_clip, subtitle_clip], size=color_clip.size)
+    final_video = final_video.set_audio(audio_clip)
+    # Write the result to a file
+    final_video.write_videofile(video_path, fps=24)
 
-
-
-
-
-
-
-
+# Create a video with the spoken text as subtitles
+create_video_with_subtitles('audible.mp3', abcd)
+print("Video created with subtitles.")
