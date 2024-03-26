@@ -1,52 +1,58 @@
+Based on the plan for modification, here is the refactored code for `audible.py`:
+
+```python
 from pdf2image import convert_from_path
 from PIL import Image
-from numpy import append
 import pytesseract
 import cv2
-from distutils.command.config import config
-from googletrans import Translator
-import os
-from text_to_speech import speak
 import pyttsx3
-import re
-import re
-import json
+import os
 
+# Initialize the text-to-speech engine
 engine = pyttsx3.init()
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[1].id)
-sent=""
 
-def talk(text):
-    speak(text,'en',file="audible.mp3",save=True, speak=True)
+def convert_pdf_to_audio(pdf_path, output_folder='audio_output'):
+    """
+    Convert a PDF file to an audio file.
 
-filename=input()
-poppler_path = r'path'
-pdf_path = filename
-images = convert_from_path(pdf_path=pdf_path, poppler_path=poppler_path)
-file_names=[]
-for count, img in enumerate(images):
-    img_name = f"page_{count+1}.png"
-    img.save(img_name, "PNG")
-    file_names.append(img_name)
-print(file_names)
+    :param pdf_path: The file path to the PDF to be converted.
+    :param output_folder: The folder where the audio file will be saved.
+    :return: The file path to the generated audio file.
+    """
+    poppler_path = r'path_to_poppler'  # Update this to your poppler installation path
+    images = convert_from_path(pdf_path=pdf_path, poppler_path=poppler_path)
+    full_text = ""
 
-for file in file_names:
-    img=cv2.imread(files)
-    text=pytesseract.image_to_string(Image.open(file), lang='eng')
-    sent=sent+text
-with open('audible.txt', 'w', encoding='utf-8') as f:
-    print(sent, file=file)
+    # Convert each page to text
+    for count, img in enumerate(images):
+        img_name = f"page_{count+1}.png"
+        img.save(img_name, "PNG")
+        img_text = pytesseract.image_to_string(Image.open(img_name), lang='eng')
+        full_text += img_text
+        os.remove(img_name)  # Clean up image files
 
-abcd=open("audible.txt",'r').read()
-print("speaking....")
-talk(abcd)    
+    # Save the text to a temporary file
+    temp_text_file = 'temp_text.txt'
+    with open(temp_text_file, 'w', encoding='utf-8') as f:
+        f.write(full_text)
 
+    # Generate the audio file
+    audio_file_path = os.path.join(output_folder, 'audible.mp3')
+    engine.save_to_file(full_text, audio_file_path)
+    engine.runAndWait()
 
+    # Clean up the temporary text file
+    os.remove(temp_text_file)
 
+    return audio_file_path
 
+# Example usage (comment out or remove before integrating with Flask):
+# audio_path = convert_pdf_to_audio('example.pdf')
+# print(f"Generated audio file: {audio_path}")
+```
 
+This refactored code defines a callable function `convert_pdf_to_audio` that accepts a PDF file path and an optional output folder. It converts the PDF to an audio file and returns the path to the generated audio file. The function also cleans up any temporary files created during the process.
 
-
-
-
+Remember to replace `'path_to_poppler'` with the actual path to your Poppler installation, and ensure that the `output_folder` exists or is created before calling the function. The example usage at the bottom is for testing purposes and should be commented out or removed when integrating with the Flask application.
