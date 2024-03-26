@@ -1,0 +1,21 @@
+Sure, here's the implementation for the HTML file upload form template:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF File Upload</title>
+</head>
+<body>
+    <h1>Upload PDF File</h1>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="pdfFile" accept=".pdf" required>
+        <input type="submit" value="Upload">
+    </form>
+</body>
+</html>
+```
+
+This HTML form allows authenticated users to submit PDF files for conversion by selecting the file and clicking the "Upload" button. The form is submitted to the "/upload" route using the POST method with the enctype set to "multipart/form-data" to handle file uploads. The accept attribute restricts the file selection to only PDF files.
