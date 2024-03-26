@@ -1,52 +1,48 @@
+To address the plan for modification of the code, I will refactor the script to accept an uploaded file as a parameter, modify the `talk` function to return the MP3 file content, and ensure the script can be called as a function from `main.py`. Here is the modified code:
+
+```python
 from pdf2image import convert_from_path
 from PIL import Image
-from numpy import append
 import pytesseract
 import cv2
-from distutils.command.config import config
 from googletrans import Translator
 import os
-from text_to_speech import speak
+from io import BytesIO
 import pyttsx3
-import re
-import re
-import json
 
+# Initialize the text-to-speech engine
 engine = pyttsx3.init()
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[1].id)
-sent=""
 
 def talk(text):
-    speak(text,'en',file="audible.mp3",save=True, speak=True)
+    # Generate speech from text
+    engine.say(text)
+    mp3_fp = BytesIO()
+    engine.save_to_file(text, mp3_fp)
+    engine.runAndWait()
+    mp3_fp.seek(0)
+    return mp3_fp
 
-filename=input()
-poppler_path = r'path'
-pdf_path = filename
-images = convert_from_path(pdf_path=pdf_path, poppler_path=poppler_path)
-file_names=[]
-for count, img in enumerate(images):
-    img_name = f"page_{count+1}.png"
-    img.save(img_name, "PNG")
-    file_names.append(img_name)
-print(file_names)
+def convert_pdf_to_speech(pdf_file_stream, poppler_path):
+    images = convert_from_path(pdf_file=pdf_file_stream, poppler_path=poppler_path)
+    sent = ""
+    
+    for count, img in enumerate(images):
+        img_name = f"page_{count+1}.png"
+        img.save(img_name, "PNG")
+        
+        img = cv2.imread(img_name)
+        text = pytesseract.image_to_string(Image.open(img_name), lang='eng')
+        sent += text
+        os.remove(img_name)  # Clean up the image file after processing
+    
+    mp3_content = talk(sent)
+    return mp3_content
 
-for file in file_names:
-    img=cv2.imread(files)
-    text=pytesseract.image_to_string(Image.open(file), lang='eng')
-    sent=sent+text
-with open('audible.txt', 'w', encoding='utf-8') as f:
-    print(sent, file=file)
+# This function can be called from main.py
+def process_pdf_and_get_mp3(pdf_file_stream, poppler_path=r'path_to_poppler'):
+    return convert_pdf_to_speech(pdf_file_stream, poppler_path)
+```
 
-abcd=open("audible.txt",'r').read()
-print("speaking....")
-talk(abcd)    
-
-
-
-
-
-
-
-
-
+This refactored code now includes a `convert_pdf_to_speech` function that takes a PDF file stream and the path to the poppler binaries as parameters. The `talk` function has been updated to use an in-memory file (`BytesIO`) to store the generated MP3 content, which it returns after speaking. The `process_pdf_and_get_mp3` function is designed to be called from `main.py`, and it returns the MP3 file stream that can be sent in a response. The temporary PNG files created during the conversion process are cleaned up after their content has been processed.
