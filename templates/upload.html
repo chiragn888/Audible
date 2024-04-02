@@ -1,0 +1,48 @@
+from flask import Flask, render_template, request, redirect, url_for
+from flask_login import LoginManager, login_user, logout_user, login_required
+from werkzeug.utils import secure_filename
+from audible import convert_to_audio
+
+app = Flask(__name__)
+app.secret_key = 'supersecretkey'  # Replace with a secure secret key
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    # Implement user loading logic here
+    pass
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        # Implement user authentication logic here
+        # If authentication is successful, use login_user(user) to log in the user
+        pass
+    # Implement the HTML form for user login with fields for 'username' and 'password'
+    return render_template('login.html')
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for('login'))
+
+@app.route('/upload', methods=['GET', 'POST'])
+@login_required
+def upload():
+    if request.method == 'POST':
+        f = request.files['file']
+        if f and f.filename.endswith('.pdf'):
+            filename = secure_filename(f.filename)
+            f.save(filename)
+            # Integrate 'audible.py' by importing the conversion function and calling it after a successful file upload
+            convert_to_audio(filename)
+            return 'File uploaded and converted to audio successfully'
+        else:
+            return 'Invalid file format. Please upload a PDF file.'
+    # Implement the HTML form for file upload that accepts only PDF files
+    return render_template('upload.html')
+
+if __name__ == '__main__':
