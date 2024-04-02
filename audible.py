@@ -1,52 +1,61 @@
-from pdf2image import convert_from_path
-from PIL import Image
-from numpy import append
-import pytesseract
-import cv2
-from distutils.command.config import config
-from googletrans import Translator
+from flask import Flask, render_template, request, session, redirect, url_for
+from werkzeug.utils import secure_filename
+from audible import convert_pdf_to_audio
 import os
-from text_to_speech import speak
-import pyttsx3
-import re
-import re
-import json
 
-engine = pyttsx3.init()
-voices = engine.getProperty('voices')
-engine.setProperty('voice', voices[1].id)
-sent=""
+app = Flask(__name__)
+app.secret_key = 'supersecretkey'
+app.config['UPLOAD_FOLDER'] = 'uploads'
 
-def talk(text):
-    speak(text,'en',file="audible.mp3",save=True, speak=True)
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in {'pdf', 'txt'}  # Example of allowed file types
 
-filename=input()
-poppler_path = r'path'
-pdf_path = filename
-images = convert_from_path(pdf_path=pdf_path, poppler_path=poppler_path)
-file_names=[]
-for count, img in enumerate(images):
-    img_name = f"page_{count+1}.png"
-    img.save(img_name, "PNG")
-    file_names.append(img_name)
-print(file_names)
+@app.route('/')
+def index():
+    if 'username' in session:
+        return redirect(url_for('upload'))
+    else:
+        return redirect(url_for('login'))
 
-for file in file_names:
-    img=cv2.imread(files)
-    text=pytesseract.image_to_string(Image.open(file), lang='eng')
-    sent=sent+text
-with open('audible.txt', 'w', encoding='utf-8') as f:
-    print(sent, file=file)
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']  # Assuming there's a password field in the form
+        if username == 'expected_username' and password == 'expected_password':  # Simple check for demonstration
+            session['username'] = username
+            return redirect(url_for('upload'))
+        else:
+            return 'Invalid credentials', 401
+    return render_template('login.html')
 
-abcd=open("audible.txt",'r').read()
-print("speaking....")
-talk(abcd)    
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+    if 'username' in session:
+        if request.method == 'POST':
+            if 'file' not in request.files:
+                return 'No file part', 400
+            f = request.files['file']
+            if f.filename == '':
+                return 'No selected file', 400
+            if f and allowed_file(f.filename):
+                filename = secure_filename(f.filename)
+                f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                return 'File uploaded successfully'
+            else:
+                return 'Invalid file type', 400
+        return render_template('upload.html')
+    else:
+        return redirect(url_for('login'))
 
+@app.route('/convert')
+def convert():
+    if 'username' in session:
+        audio_file = convert_pdf_to_audio('uploads/example.pdf')
+        return audio_file
+    else:
+        return redirect(url_for('login'))
 
-
-
-
-
-
-
-
+if __name__ == '__main__':
+    app.run(debug=True)
