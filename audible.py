@@ -1,52 +1,42 @@
 from pdf2image import convert_from_path
 from PIL import Image
-from numpy import append
 import pytesseract
 import cv2
-from distutils.command.config import config
-from googletrans import Translator
-import os
-from text_to_speech import speak
 import pyttsx3
-import re
-import re
-import json
+import os
+import tempfile
 
+# Initialize the text-to-speech engine
 engine = pyttsx3.init()
 voices = engine.getProperty('voices')
 engine.setProperty('voice', voices[1].id)
-sent=""
 
-def talk(text):
-    speak(text,'en',file="audible.mp3",save=True, speak=True)
+def convert_pdf_to_audio(pdf_file_path):
+    # Create a temporary directory to store images
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # Convert PDF to a list of images
+        images = convert_from_path(pdf_file_path=pdf_file_path, poppler_path=r'path')
+        full_text = ""
 
-filename=input()
-poppler_path = r'path'
-pdf_path = filename
-images = convert_from_path(pdf_path=pdf_path, poppler_path=poppler_path)
-file_names=[]
-for count, img in enumerate(images):
-    img_name = f"page_{count+1}.png"
-    img.save(img_name, "PNG")
-    file_names.append(img_name)
-print(file_names)
+        # Process each page/image in the PDF
+        for count, img in enumerate(images):
+            img_name = os.path.join(temp_dir, f"page_{count+1}.png")
+            img.save(img_name, "PNG")
 
-for file in file_names:
-    img=cv2.imread(files)
-    text=pytesseract.image_to_string(Image.open(file), lang='eng')
-    sent=sent+text
-with open('audible.txt', 'w', encoding='utf-8') as f:
-    print(sent, file=file)
+            # Extract text from image using OCR
+            img_cv = cv2.imread(img_name)
+            text = pytesseract.image_to_string(Image.open(img_name), lang='eng')
+            full_text += text
 
-abcd=open("audible.txt",'r').read()
-print("speaking....")
-talk(abcd)    
+        # Save the extracted text to a temporary text file
+        text_file_path = os.path.join(temp_dir, 'audible.txt')
+        with open(text_file_path, 'w', encoding='utf-8') as f:
+            f.write(full_text)
 
+        # Generate audio from text
+        audio_file_path = os.path.join(temp_dir, 'audible.mp3')
+        engine.save_to_file(full_text, audio_file_path)
+        engine.runAndWait()
 
-
-
-
-
-
-
-
+        # Return the path to the audio file
+        return audio_file_path
