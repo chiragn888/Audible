@@ -1,48 +1,31 @@
-from flask import Flask, render_template, request, redirect, url_for
-from flask_login import LoginManager, login_user, login_required, logout_user
-from werkzeug.security import generate_password_hash, check_password_hash
-from audible import convert_to_audio
+Based on the plan for modification provided, I will replace the current content with a basic HTML structure for a login form. The code below will be the new content for the `login.html` template, which should be located in the `templates` directory of your Flask application. This new HTML structure will include a form with 'username' and 'password' input fields and a submit button, with the 'action' attribute set to the URL for the login route and the 'method' attribute set to "POST".
 
-app = Flask(__name__)
-app.secret_key = 'supersecretkey'
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+    <form action="/login" method="POST">
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div>
+            <button type="submit">Login</button>
+        </div>
+        {% if error %}
+            <p>{{ error }}</p>
+        {% endif %}
+    </form>
+</body>
+</html>
+```
 
-login_manager = LoginManager()
-login_manager.init_app(app)
-
-@login_manager.user_loader
-def load_user(user_id):
-    # Implement user loading logic here
-    pass
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        # Implement user authentication logic here
-        # Example: user = User.query.filter_by(username=username).first()
-        # if user and check_password_hash(user.password, password):
-        #     login_user(user)
-        #     return redirect(url_for('upload'))
-        # else:
-        #     return render_template('login.html', error='Invalid username or password')
-    return render_template('login.html')
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('login'))
-
-@app.route('/upload', methods=['POST'])
-@login_required
-def upload():
-    # Implement file upload logic here
-    # Example: file = request.files['file']
-    # if file:
-    #     # Save file to server
-    #     # Call audible conversion function
-    #     convert_to_audio(file)
-    return redirect(url_for('login'))
-
-if __name__ == '__main__':
+Please ensure that this HTML content replaces the existing content in the `login.html` file within the `templates` directory of your Flask application. The Flask route for `/login` will render this template when a GET request is made, and the form will be submitted to the same route with a POST request, as per the current code structure and the plan for modification.
