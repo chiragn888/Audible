@@ -1,0 +1,31 @@
+Based on the plan for modification provided, I will replace the current content with a basic HTML structure for a login form. The code below will be the new content for the `login.html` template, which should be located in the `templates` directory of your Flask application. This new HTML structure will include a form with 'username' and 'password' input fields and a submit button, with the 'action' attribute set to the URL for the login route and the 'method' attribute set to "POST".
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+    <form action="/login" method="POST">
+        <div>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div>
+            <button type="submit">Login</button>
+        </div>
+        {% if error %}
+            <p>{{ error }}</p>
+        {% endif %}
+    </form>
+</body>
+</html>
+```
+
+Please ensure that this HTML content replaces the existing content in the `login.html` file within the `templates` directory of your Flask application. The Flask route for `/login` will render this template when a GET request is made, and the form will be submitted to the same route with a POST request, as per the current code structure and the plan for modification.
