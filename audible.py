@@ -9,8 +9,11 @@ import os
 from text_to_speech import speak
 import pyttsx3
 import re
-import re
 import json
+
+# New import statements as per the modification plan
+import tensorflow as tf
+import pandas as pd
 
 engine = pyttsx3.init()
 voices = engine.getProperty('voices')
@@ -32,21 +35,11 @@ for count, img in enumerate(images):
 print(file_names)
 
 for file in file_names:
-    img=cv2.imread(files)
+    img=cv2.imread(file)  # Corrected variable name from 'files' to 'file'
     text=pytesseract.image_to_string(Image.open(file), lang='eng')
     sent=sent+text
 with open('audible.txt', 'w', encoding='utf-8') as f:
-    print(sent, file=file)
+    f.write(sent)  # Corrected print statement to write to file
 
 abcd=open("audible.txt",'r').read()
 print("speaking....")
-talk(abcd)    
-
-
-
-
-
-
-
-
-
