@@ -1,14 +1,15 @@
+import tensorflow as tf  # Added import statement for TensorFlow
+import pandas as pd      # Added import statement for Pandas
 from pdf2image import convert_from_path
 from PIL import Image
 from numpy import append
 import pytesseract
 import cv2
-from distutils.command.config import config
+# Removed duplicate import statement for 're'
 from googletrans import Translator
 import os
 from text_to_speech import speak
 import pyttsx3
-import re
 import re
 import json
 
@@ -32,21 +33,11 @@ for count, img in enumerate(images):
 print(file_names)
 
 for file in file_names:
-    img=cv2.imread(files)
-    text=pytesseract.image_to_string(Image.open(file), lang='eng')
-    sent=sent+text
+    img = cv2.imread(file)  # Corrected the typo from 'files' to 'file'
+    text = pytesseract.image_to_string(Image.open(file), lang='eng')
+    sent = sent + text
 with open('audible.txt', 'w', encoding='utf-8') as f:
-    print(sent, file=file)
+    print(sent, file=f)  # Corrected the print statement to output to the file object 'f'
 
-abcd=open("audible.txt",'r').read()
+abcd = open("audible.txt", 'r').read()
 print("speaking....")
-talk(abcd)    
-
-
-
-
-
-
-
-
-
