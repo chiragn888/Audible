@@ -1,3 +1,5 @@
+import tensorflow as tf
+import pandas as pd
 from pdf2image import convert_from_path
 from PIL import Image
 from numpy import append
@@ -8,7 +10,6 @@ from googletrans import Translator
 import os
 from text_to_speech import speak
 import pyttsx3
-import re
 import re
 import json
 
@@ -32,21 +33,11 @@ for count, img in enumerate(images):
 print(file_names)
 
 for file in file_names:
-    img=cv2.imread(files)
+    img=cv2.imread(file)
     text=pytesseract.image_to_string(Image.open(file), lang='eng')
     sent=sent+text
 with open('audible.txt', 'w', encoding='utf-8') as f:
-    print(sent, file=file)
+    f.write(sent)
 
 abcd=open("audible.txt",'r').read()
 print("speaking....")
-talk(abcd)    
-
-
-
-
-
-
-
-
-
