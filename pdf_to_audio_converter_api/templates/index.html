@@ -1,0 +1,48 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to Audio Converter</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Upload PDF to Convert to Audio</h2>
+        <form id="pdf-upload-form" class="form-group">
+            <input type="file" id="pdf-file" name="pdf-file" accept=".pdf" required>
+            <button type="submit" class="button">Convert to Audio</button>
+        </form>
+        <audio controls class="audio-player" id="audio-player">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+
+    <script>
+        document.getElementById('pdf-upload-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const formData = new FormData();
+            const pdfFile = document.getElementById('pdf-file').files[0];
+            formData.append('pdf-file', pdfFile);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                const audioPlayer = document.getElementById('audio-player');
+                audioPlayer.src = data.audio_url;
+                audioPlayer.load();
+                audioPlayer.play();
+            } catch (error) {
+                alert(`Failed to convert PDF to audio: ${error.message}`);
+            }
+        });
+    </script>
+</body>
+</html>
