@@ -1,0 +1,28 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF to Audio Converter</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="form-wrapper">
+            <h2 class="form-title">PDF to Audio Converter</h2>
+            <form id="upload-form">
+                <div class="input-group">
+                    <label for="pdf-file" class="input-label">Select PDF File:</label>
+                    <input type="file" id="pdf-file" class="input-field" accept=".pdf">
+                </div>
+                <button type="submit" id="convert-button" class="submit-button">Convert to Audio</button>
+            </form>
+            <div id="audio-controls" class="audio-controls" style="display: none;">
+                <audio id="audio-player" controls></audio>
+                <a id="download-link" href="#" download>Download Audio</a>
+            </div>
+            <div id="error-message" class="error-message"></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
